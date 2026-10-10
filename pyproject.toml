@@ -1,0 +1,32 @@
+[project]
+name = "payment-ledger"
+version = "0.1.0"
+description = "Double-entry payment ledger with idempotent money movements (FastAPI, PostgreSQL)"
+readme = "README.md"
+authors = [
+    { name = "Davy-10", email = "bansaldivyanshu99@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "alembic>=1.19.1",
+    "asyncpg>=0.31.0",
+    "fastapi>=0.141.1",
+    "pydantic-settings>=2.15.0",
+    "sqlalchemy>=2.0.52",
+    "uvicorn[standard]>=0.52.4",
+]
+
+[dependency-groups]
+dev = [
+    "aiosqlite>=0.20.0",
+    "httpx>=0.28.1",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
