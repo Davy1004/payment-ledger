@@ -44,3 +44,10 @@ TEST_DATABASE_URL=postgresql+asyncpg://ledger_user:ledger_password@localhost:543
 
 ## Not built (deliberately)
 Authentication, reversals/refunds (add a compensating transaction), multi-currency FX, outbox/event publishing.
+
+## Deploy for free
+1. **Database:** create a free project on [Neon](https://neon.com) and copy its connection string. Paste it as-is: the app converts `postgresql://…?sslmode=require` into the form its async driver needs.
+2. **API:** on [Render](https://render.com) choose *New → Blueprint* (or *Web Service → Docker*) and select this repo. `render.yaml` is picked up; set `DATABASE_URL` when asked. Each start runs `alembic upgrade head`, then serves the API on Render's `$PORT`.
+3. Open `https://<your-service>.onrender.com/docs` for the interactive API.
+
+Free-tier behaviour to expect: Render sleeps the service after 15 minutes without traffic and needs about a minute to wake it; Neon also suspends an idle database and wakes on the next query.

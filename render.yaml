@@ -1,0 +1,11 @@
+# Free deployment: Render builds the Dockerfile; the database is a free Neon Postgres.
+# The container applies migrations on every start, then serves the API.
+services:
+  - type: web
+    name: payment-ledger
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        sync: false   # paste the Neon connection string in the Render dashboard (as-is is fine)
