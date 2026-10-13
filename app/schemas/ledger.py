@@ -43,6 +43,34 @@ class TransferCreate(MoneyRequest):
         return self
 
 
+class ReversalRequest(BaseModel):
+    description: str | None = Field(default=None, max_length=255, description="why, e.g. 'customer refund'")
+
+
+class ClientCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=120)
+
+
+class ClientOut(BaseModel):
+    id: uuid.UUID
+    name: str
+    api_key: str = Field(description="shown ONCE; only its hash is stored")
+
+
+class OutboxSummary(BaseModel):
+    pending: int
+    delivered: int
+    dead: int
+    oldest_pending_age_seconds: float | None
+
+
+class DispatchResult(BaseModel):
+    attempted: int
+    delivered: int
+    failed: int
+    dead: int
+
+
 class EntryOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
@@ -58,6 +86,7 @@ class TransactionOut(BaseModel):
     id: uuid.UUID
     type: str
     description: str | None
+    reversal_of_id: uuid.UUID | None = None
     created_at: datetime
     entries: list[EntryOut]
 

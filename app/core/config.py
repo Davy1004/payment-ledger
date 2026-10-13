@@ -30,6 +30,16 @@ class Settings(BaseSettings):
     # (a plain postgres:// or postgresql:// string from your host also works)
     database_url: str
     sql_echo: bool = False  # set SQL_ECHO=true to print every SQL statement while debugging
+    # Operator key for /admin/* and /metrics. Unset = those endpoints answer 503 (fail closed).
+    admin_api_key: str | None = None
+    # requests per minute allowed per API client (token bucket); 0 turns the limiter off
+    rate_limit_per_minute: int = 120
+    # outbox -> webhook delivery. No URL = events are still recorded, just not delivered.
+    webhook_url: str | None = None
+    webhook_secret: str = ""
+    webhook_timeout_seconds: float = 5.0
+    outbox_max_attempts: int = 8
+    log_level: str = "INFO"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 

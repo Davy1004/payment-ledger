@@ -2,6 +2,8 @@ import uuid
 
 import pytest
 
+from tests.conftest import ADMIN
+
 pytestmark = pytest.mark.asyncio
 
 
@@ -122,7 +124,7 @@ async def test_reconciliation_is_clean_after_activity(client):
     await deposit(client, a, 1000)
     await client.post("/api/v1/transfers", json={"from_account_id": a, "to_account_id": b, "amount": 250}, headers=key())
     await client.post(f"/api/v1/accounts/{b}/withdrawals", json={"amount": 100}, headers=key())
-    assert (await client.get("/api/v1/admin/reconciliation")).json() == {"ok": True, "ledger_sum": 0, "mismatched_accounts": []}
+    assert (await client.get("/api/v1/admin/reconciliation", headers=ADMIN)).json() == {"ok": True, "ledger_sum": 0, "mismatched_accounts": []}
 
 
 async def test_reconciliation_detects_tampering(client, session_maker):
@@ -131,7 +133,7 @@ async def test_reconciliation_detects_tampering(client, session_maker):
     await deposit(client, a, 1000)
     async with session_maker() as s, s.begin():  # someone edits a balance behind the ledger's back
         await s.execute(text("UPDATE accounts SET balance = balance + 5 WHERE kind = 'USER'"))
-    report = (await client.get("/api/v1/admin/reconciliation")).json()
+    report = (await client.get("/api/v1/admin/reconciliation", headers=ADMIN)).json()
     assert report["ok"] is False and report["mismatched_accounts"][0]["cached_balance"] == 1005
 
 

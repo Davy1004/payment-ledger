@@ -5,7 +5,7 @@ from fastapi import APIRouter, Query, Response, status
 
 from app.api.deps import IdempotencyKey, Service
 from app.schemas.ledger import (AccountCreate, AccountOut, EntryOut, MoneyRequest,
-                                TransactionOut, TransferCreate)
+                                ReversalRequest, TransactionOut, TransferCreate)
 
 router = APIRouter(tags=["accounts & money"])
 
@@ -54,6 +54,14 @@ async def transfer(body: TransferCreate, key: IdempotencyKey, service: Service, 
     return _respond(await service.transfer(from_id=body.from_account_id, to_id=body.to_account_id,
                                            amount=body.amount, key=key,
                                            description=body.description), response)
+
+
+@router.post("/transactions/{transaction_id}/reversals", response_model=TransactionOut, status_code=201)
+async def reverse(transaction_id: uuid.UUID, key: IdempotencyKey, service: Service, response: Response,
+                  body: ReversalRequest | None = None):
+    """Refund/undo: posts a compensating transaction. Allowed once per transaction."""
+    return _respond(await service.reverse(transaction_id=transaction_id, key=key,
+                                          description=body.description if body else None), response)
 
 
 @router.get("/transactions/{transaction_id}", response_model=TransactionOut)

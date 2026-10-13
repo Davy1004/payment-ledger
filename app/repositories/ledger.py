@@ -39,8 +39,18 @@ class LedgerRepository:
     async def get_transaction(self, tx_id: uuid.UUID) -> Transaction | None:
         return await self.session.get(Transaction, tx_id)
 
-    async def get_transaction_by_key(self, key: str) -> Transaction | None:
-        stmt = select(Transaction).where(Transaction.idempotency_key == key)
+    async def get_transaction_by_key(self, client_id: uuid.UUID, key: str) -> Transaction | None:
+        stmt = select(Transaction).where(Transaction.client_id == client_id,
+                                         Transaction.idempotency_key == key)
+        return (await self.session.execute(stmt)).scalar_one_or_none()
+
+    async def lock_transaction(self, tx_id: uuid.UUID) -> Transaction | None:
+        """Serialises competing reversals of the same transaction (second one waits, then sees the first)."""
+        stmt = select(Transaction).where(Transaction.id == tx_id).with_for_update()
+        return (await self.session.execute(stmt)).scalar_one_or_none()
+
+    async def get_reversal_of(self, tx_id: uuid.UUID) -> Transaction | None:
+        stmt = select(Transaction).where(Transaction.reversal_of_id == tx_id)
         return (await self.session.execute(stmt)).scalar_one_or_none()
 
     # ---- statements & integrity ----

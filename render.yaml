@@ -9,3 +9,11 @@ services:
     envVars:
       - key: DATABASE_URL
         sync: false   # paste the Neon connection string in the Render dashboard (as-is is fine)
+      - key: ADMIN_API_KEY
+        sync: false   # choose a long random value in the Render dashboard; guards /admin/* and /metrics
+      - key: WEBHOOK_URL
+        sync: false   # optional: where signed transaction events are POSTed
+      - key: WEBHOOK_SECRET
+        sync: false
+      - key: RATE_LIMIT_PER_MINUTE
+        value: "120"
