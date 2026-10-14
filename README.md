@@ -1,5 +1,7 @@
 # Payment Transaction Ledger
 
+**Live API docs:** https://payment-ledger-llnm.onrender.com/docs (free tier: the first request after idle takes about a minute to wake up; trying the endpoints needs an API key)
+
 A small **double-entry ledger** API: accounts, deposits, withdrawals and transfers where money can never be created,
 lost, double-spent or applied twice.
 
